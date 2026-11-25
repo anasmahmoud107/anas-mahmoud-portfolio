@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="portfolio-build" content="2026-11-25-mobile-category-strip-v6">
+  <meta name="portfolio-build" content="2026-11-25-project-image-viewer-v7">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#eeede8">
   <title>Anas Mahmoud — Graphic Designer &amp; Creative Visual Solver</title>
@@ -637,6 +637,108 @@ p { line-height: var(--leading-copy); }
 
 </style>
   
+  <style>
+.case-study-image {
+  display: block;
+  margin-inline: auto;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  line-height: 0;
+  cursor: zoom-in;
+}
+.case-study-image img { width: 100%; }
+.case-study-image:focus-visible { outline-offset: -4px; }
+.image-viewer {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  max-width: 100vw;
+  height: 100dvh;
+  max-height: 100dvh;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: #111;
+  color: #f4f3ee;
+  overflow: hidden;
+}
+.image-viewer[open] { display: grid; grid-template-rows: auto minmax(0, 1fr) auto; }
+.image-viewer::backdrop { background: #111; }
+.image-viewer-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 16px;
+  border-bottom: 1px solid #333;
+}
+.image-viewer-counter { margin: 0; min-width: 40px; font-size: 12px; font-variant-numeric: tabular-nums; }
+.image-viewer-actions { display: flex; align-items: center; gap: 6px; }
+.image-viewer-actions button {
+  display: grid;
+  place-items: center;
+  flex: none;
+  min-width: 44px;
+  height: 44px;
+  padding: 8px;
+  border: 1px solid #53534e;
+  border-radius: 4px;
+  background: transparent;
+  color: inherit;
+  font-size: 22px;
+  line-height: 1;
+}
+.image-viewer-actions [data-image-zoom] { min-width: 76px; font-size: 12px; }
+.image-viewer-actions button:hover { background: #30302d; }
+.image-viewer-actions button:focus-visible { outline: 2px solid #f4f3ee; outline-offset: 2px; }
+.image-viewer-actions button:disabled { opacity: .35; }
+.image-viewer-stage {
+  min-width: 0;
+  min-height: 0;
+  padding: 16px;
+  overflow: auto;
+  overscroll-behavior: contain;
+  touch-action: pan-y pinch-zoom;
+}
+.image-viewer-image-button {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: zoom-in;
+}
+.image-viewer-image {
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+.image-viewer-caption {
+  margin: 0;
+  padding: 10px 16px;
+  border-top: 1px solid #333;
+  color: #d2d1cb;
+  font-size: 12px;
+  line-height: 1.5;
+}
+.image-viewer.is-zoomed .image-viewer-stage { touch-action: pan-x pan-y pinch-zoom; }
+.image-viewer.is-zoomed .image-viewer-image-button { width: max-content; min-width: 100%; height: max-content; min-height: 100%; cursor: zoom-out; }
+.image-viewer.is-zoomed .image-viewer-image { width: var(--image-width); height: auto; max-width: none; max-height: none; }
+@media (max-width: 420px) {
+  .image-viewer-toolbar { gap: 8px; padding: 10px 8px; }
+  .image-viewer-stage { padding: 8px; }
+  .image-viewer-caption { padding-inline: 12px; }
+}
+
+</style>
+  
   
   
 </head>
@@ -807,6 +909,19 @@ p { line-height: var(--leading-copy); }
   </main>
   <footer class="site-footer meta"><span>© <span id="copyright-year">2026</span> Anas Mahmoud.</span><span>Thought through. Made with intent.</span><span>Worldwide</span></footer>
   <dialog class="project-dialog" id="project-dialog" aria-labelledby="dialog-title"><div class="dialog-top"><span class="meta">Selected work / Project overview</span><button class="dialog-close" type="button" aria-label="Close project">Close <span>×</span></button></div><div class="dialog-content" id="dialog-content"></div></dialog>
+  <dialog class="image-viewer" id="image-viewer" aria-label="Full size project image">
+    <div class="image-viewer-toolbar">
+      <p class="image-viewer-counter" data-image-counter aria-live="polite"></p>
+      <div class="image-viewer-actions">
+        <button type="button" data-image-previous aria-label="Previous image">←</button>
+        <button type="button" data-image-next aria-label="Next image">→</button>
+        <button type="button" data-image-zoom aria-label="View image at full size" aria-pressed="false">Zoom in</button>
+        <button type="button" data-image-close aria-label="Close image" autofocus>×</button>
+      </div>
+    </div>
+    <div class="image-viewer-stage"><button class="image-viewer-image-button" type="button" aria-label="Toggle image zoom"><img class="image-viewer-image" alt=""></button></div>
+    <p class="image-viewer-caption" data-image-caption></p>
+  </dialog>
 <script>
 const behanceGalleries = {
   '148669027': {
@@ -1210,7 +1325,7 @@ const dialogActionArrow = `<svg class="dialog-action-arrow" viewBox="0 0 14 14" 
 const behanceModuleOrigin = 'https://mir-s3-cdn-cf.behance.net/project_modules/';
 
 function galleryImage([file, width, height], alt, percent = 100) {
-  return `<img src="${behanceModuleOrigin}${file}" width="${width}" height="${height}" alt="${alt}" style="width:${percent}%" loading="lazy" decoding="async">`;
+  return `<button type="button" class="case-study-image" style="width:${percent}%" aria-label="Enlarge ${alt}" aria-haspopup="dialog"><img src="${behanceModuleOrigin}${file}" width="${width}" height="${height}" alt="${alt}" loading="lazy" decoding="async"></button>`;
 }
 
 function renderGallery(project) {
@@ -1480,6 +1595,113 @@ if ('IntersectionObserver' in window) {
     marqueeTrack.classList.toggle('is-offscreen', !entry.isIntersecting);
   }).observe(document.querySelector('.discipline-strip'));
 }
+
+</script>
+<script>
+(() => {
+  const viewer = document.getElementById('image-viewer');
+  const stage = viewer.querySelector('.image-viewer-stage');
+  const image = viewer.querySelector('.image-viewer-image');
+  const imageButton = viewer.querySelector('.image-viewer-image-button');
+  const counter = viewer.querySelector('[data-image-counter]');
+  const caption = viewer.querySelector('[data-image-caption]');
+  const previous = viewer.querySelector('[data-image-previous]');
+  const next = viewer.querySelector('[data-image-next]');
+  const zoom = viewer.querySelector('[data-image-zoom]');
+  let images = [];
+  let index = 0;
+  let trigger = null;
+  let projectScrollTop = 0;
+  let zoomed = false;
+  let gesture = null;
+  let suppressClickUntil = 0;
+
+  function setZoom(value) {
+    zoomed = value;
+    viewer.classList.toggle('is-zoomed', zoomed);
+    zoom.setAttribute('aria-pressed', String(zoomed));
+    zoom.setAttribute('aria-label', zoomed ? 'Fit image to screen' : 'View image at full size');
+    zoom.textContent = zoomed ? 'Fit image' : 'Zoom in';
+    stage.scrollTo(0, 0);
+  }
+
+  function showImage(position) {
+    index = (position + images.length) % images.length;
+    const source = images[index].querySelector('img');
+    image.src = source.currentSrc || source.src;
+    image.alt = source.alt;
+    image.width = Number(source.getAttribute('width'));
+    image.height = Number(source.getAttribute('height'));
+    viewer.style.setProperty('--image-width', `${source.naturalWidth || image.width}px`);
+    counter.textContent = `${index + 1} / ${images.length}`;
+    caption.textContent = source.alt;
+    previous.disabled = next.disabled = images.length < 2;
+    setZoom(false);
+  }
+
+  content.addEventListener('click', event => {
+    const button = event.target.closest('.case-study-image');
+    if (!button) return;
+    images = [...content.querySelectorAll('.case-study-image')];
+    trigger = button;
+    projectScrollTop = dialog.scrollTop;
+    showImage(images.indexOf(button));
+    viewer.showModal();
+  });
+
+  previous.addEventListener('click', () => showImage(index - 1));
+  next.addEventListener('click', () => showImage(index + 1));
+  zoom.addEventListener('click', () => setZoom(!zoomed));
+  imageButton.addEventListener('click', () => {
+    if (performance.now() >= suppressClickUntil) setZoom(!zoomed);
+  });
+  viewer.querySelector('[data-image-close]').addEventListener('click', () => viewer.close());
+  viewer.addEventListener('keydown', event => {
+    if (event.altKey || event.ctrlKey || event.metaKey) return;
+    if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
+    event.preventDefault();
+    event.stopPropagation();
+    showImage(index + (event.key === 'ArrowRight' ? 1 : -1));
+  });
+  viewer.addEventListener('cancel', event => {
+    event.preventDefault();
+    event.stopPropagation();
+    viewer.close();
+  });
+  viewer.addEventListener('close', () => {
+    image.removeAttribute('src');
+    image.alt = '';
+    setZoom(false);
+    gesture = null;
+    suppressClickUntil = 0;
+    images = [];
+    if (dialog.open && trigger?.isConnected) {
+      dialog.scrollTop = projectScrollTop;
+      trigger.focus({ preventScroll: true });
+    }
+    trigger = null;
+  });
+  dialog.addEventListener('close', () => {
+    if (viewer.open) viewer.close();
+  });
+
+  // Native panning handles a full-size image; horizontal swipes navigate fitted images.
+  stage.addEventListener('pointerdown', event => {
+    gesture = event.pointerType === 'touch' && event.isPrimary && !zoomed
+      ? { id: event.pointerId, x: event.clientX, y: event.clientY }
+      : null;
+  });
+  stage.addEventListener('pointercancel', () => { gesture = null; });
+  stage.addEventListener('pointerup', event => {
+    if (!gesture || gesture.id !== event.pointerId || zoomed) return;
+    const x = event.clientX - gesture.x;
+    const y = event.clientY - gesture.y;
+    gesture = null;
+    if (Math.abs(x) < 60 || Math.abs(x) < Math.abs(y) * 1.4) return;
+    suppressClickUntil = performance.now() + 350;
+    showImage(index + (x < 0 ? 1 : -1));
+  });
+})();
 
 </script>
 <script>
