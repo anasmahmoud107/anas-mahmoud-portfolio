@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="portfolio-build" content="2026-11-25-nbricks-cover-carousel-v3">
+  <meta name="portfolio-build" content="2026-11-25-project-categories-nbricks-spacing-v4">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#eeede8">
   <title>Anas Mahmoud — Graphic Designer &amp; Creative Visual Solver</title>
@@ -320,6 +320,9 @@
 }
 
 .behance-card { display: grid; align-content: start; gap: 10px; }
+.behance-card[hidden], .behance-more[hidden] { display: none; }
+.filters { flex-wrap: wrap; }
+.filters { flex-wrap: wrap; }
 
 .behance-card img {
   display: block;
@@ -379,6 +382,10 @@
 .case-study-module {
   padding-bottom: min(var(--module-gap), 4vw);
 }
+.case-study-nbricks .case-study-module {
+  padding-bottom: clamp(24px, 6.77vw, var(--module-gap));
+}
+.case-study-nbricks .case-study-module:last-child { padding-bottom: 0; }
 .case-study img {
   display: block;
   height: auto;
@@ -613,7 +620,7 @@ p { line-height: var(--leading-copy); }
     <section class="work section-pad" id="work" aria-labelledby="work-title">
       <div class="section-heading"><span class="section-label">02 / Selected work</span><span class="meta">A selection across disciplines / <span data-project-total>17</span> projects</span></div>
       <div class="work-title-row"><h2 id="work-title">WORK<span class="serif">,</span><br><span class="outline">WITH INTENT.</span></h2><div class="work-index" aria-hidden="true">↙</div></div>
-      <div class="filter-row"><span class="meta">Filter featured projects</span><div class="filters" role="group" aria-label="Filter featured projects"><button type="button" class="active" data-filter="all" aria-pressed="true">All</button><button type="button" data-filter="branding" aria-pressed="false">Branding</button><button type="button" data-filter="direction" aria-pressed="false">Art direction</button><button type="button" data-filter="digital" aria-pressed="false">Digital</button></div></div>
+      <div class="filter-row"><span class="meta">Filter projects</span><div class="filters" role="group" aria-label="Filter projects"><button type="button" class="active" data-filter="all" aria-pressed="true">All</button><button type="button" data-filter="branding" aria-pressed="false">Branding</button><button type="button" data-filter="direction" aria-pressed="false">Art direction</button><button type="button" data-filter="digital" aria-pressed="false">Digital</button><button type="button" data-filter="print" aria-pressed="false">Print &amp; Editorial</button><button type="button" data-filter="illustration" aria-pressed="false">Illustration</button></div></div>
       <p class="sr-only" id="filter-status" aria-live="polite">Showing 6 featured projects</p>
       <div class="project-grid" id="featured-projects">
         <article class="project" data-category="branding" data-project="vida">
@@ -941,12 +948,12 @@ const behanceGalleries = {
   '257312467': {
     background: 'rgb(0, 0, 0)',
     modules: [
-      ["i",0,"fs_webp/1565b0257312467.6b06ac44c8363.png",1400,1094,100],
-      ["i",0,"fs_webp/573180257312467.6b06ac44c7ca2.png",1400,1094,100],
-      ["i",0,"fs_webp/95cd7a257312467.6b06ac44c75a5.png",1400,1094,100],
-      ["v",0,"https://www-ccv.adobe.io/v1/player/ccv/VnJScAMx8aj/embed?api_key=behance1&bgcolor=%23191919",1200,936,86],
-      ["i",0,"fs_webp/f1eb68257312467.6b06ac44c90d1.png",1400,1094,100],
-      ["i",0,"fs_webp/3d7acc257312467.6b06ac44c8a34.png",1400,1094,100]
+      ["i",66,"fs_webp/1565b0257312467.6b06ac44c8363.png",1400,1094,100],
+      ["i",66,"fs_webp/573180257312467.6b06ac44c7ca2.png",1400,1094,100],
+      ["i",66,"fs_webp/95cd7a257312467.6b06ac44c75a5.png",1400,1094,100],
+      ["v",66,"https://www-ccv.adobe.io/v1/player/ccv/VnJScAMx8aj/embed?api_key=behance1&bgcolor=%23191919",1200,936,86],
+      ["i",66,"fs_webp/f1eb68257312467.6b06ac44c90d1.png",1400,1094,100],
+      ["i",66,"fs_webp/3d7acc257312467.6b06ac44c8a34.png",1400,1094,100]
     ]
   },
   '258049243': {
@@ -977,8 +984,36 @@ const projects = {
   customtype: { title: 'Customtype Style', label: '06 / Brand awareness campaign', url: 'https://www.behance.net/gallery/227379079/Customtype-Style-Brand-Awareness-Campaign' }
 };
 
+// A project can belong to more than one discipline.
+const projectCategories = {
+  nbricks: ['branding'],
+  vida: ['branding'],
+  '225253433': ['branding'],
+  '164805501': ['branding'],
+  '149265057': ['branding'],
+  k7: ['direction', 'digital'],
+  customtype: ['direction', 'digital'],
+  moodboard: ['direction'],
+  '178634381': ['direction', 'digital'],
+  '221675327': ['direction', 'digital'],
+  brutalist: ['digital'],
+  '148669027': ['digital'],
+  '175228467': ['digital'],
+  '209341221': ['digital'],
+  '209162095': ['print'],
+  '172614793': ['print'],
+  '165136097': ['illustration']
+};
+const projectMatches = (key, category) => category === 'all' || projectCategories[key]?.includes(category);
+
 const filterButtons = document.querySelectorAll('[data-filter]');
 const projectCards = document.querySelectorAll('.project');
+const additionalProjectCards = [...document.querySelectorAll('.behance-grid .behance-card')];
+projectCards.forEach(card => card.dataset.category = projectCategories[card.dataset.project].join(' '));
+additionalProjectCards.forEach(card => {
+  card.dataset.project = new URL(card.href).pathname.split('/')[2];
+  card.dataset.category = projectCategories[card.dataset.project].join(' ');
+});
 const featuredProjects = document.getElementById('featured-projects');
 const moreFeaturedProjects = document.getElementById('more-featured-projects');
 const moreProjects = moreFeaturedProjects.closest('details');
@@ -994,9 +1029,12 @@ const mobileWork = window.matchMedia('(max-width: 700px)');
 function updateProjectCounts() {
   const visibleFeatured = featuredProjects.querySelectorAll('.project:not([hidden])').length;
   const visibleInMore = moreFeaturedProjects.querySelectorAll('.project:not([hidden])').length;
-  moreProjectsCount.textContent = `${behanceProjectCount + visibleInMore} more projects`;
-  const visible = visibleFeatured + (moreProjects.open ? visibleInMore : 0);
-  filterStatus.textContent = `Showing ${visible} featured ${visible === 1 ? 'project' : 'projects'}`;
+  const visibleAdditional = additionalProjectCards.filter(card => !card.hidden).length;
+  const extra = visibleAdditional + visibleInMore;
+  moreProjectsCount.textContent = `${extra} more ${extra === 1 ? 'project' : 'projects'}`;
+  moreProjects.hidden = extra === 0;
+  const total = visibleFeatured + extra;
+  filterStatus.textContent = `${total} ${total === 1 ? 'project' : 'projects'} in ${document.querySelector('[data-filter][aria-pressed="true"]').textContent}`;
 }
 
 function placeFeaturedProjects() {
@@ -1008,9 +1046,7 @@ function placeFeaturedProjects() {
   });
 
   const activeFilter = document.querySelector('[data-filter][aria-pressed="true"]').dataset.filter;
-  if (mobileWork.matches && activeFilter !== 'all' && moreFeaturedProjects.querySelector('.project:not([hidden])')) {
-    moreProjects.open = true;
-  }
+  if (activeFilter !== 'all') moreProjects.open = true;
   updateProjectCounts();
 }
 
@@ -1025,18 +1061,17 @@ filterButtons.forEach(button => button.addEventListener('click', () => {
     item.classList.toggle('active', active);
     item.setAttribute('aria-pressed', String(active));
   });
-  projectCards.forEach(card => {
-    card.hidden = selected !== 'all' && card.dataset.category !== selected;
+  [...projectCards, ...additionalProjectCards].forEach(card => {
+    card.hidden = !projectMatches(card.dataset.project, selected);
   });
-  if (mobileWork.matches) {
-    moreProjects.open = selected !== 'all' && Boolean(moreFeaturedProjects.querySelector('.project:not([hidden])'));
-  }
+  moreProjects.open = selected !== 'all';
 
-  const visibleCards = [...projectCards].filter(card =>
+  const visibleCards = [...projectCards, ...additionalProjectCards].filter(card =>
     !card.hidden && (card.parentElement === featuredProjects || moreProjects.open)
   );
   visibleCards.forEach((card, index) => animateEntrance(card, (index % 2) * 70, 20, 520));
   updateProjectCounts();
+  document.dispatchEvent(new CustomEvent('portfolio-filter-change', { detail: selected }));
 }));
 
 const dialog = document.getElementById('project-dialog');
@@ -1087,7 +1122,7 @@ function renderGallery(project) {
     }
     return `<div class="case-study-module" style="--module-gap:${spacing}px">${markup}</div>`;
   });
-  return `<div class="case-study" style="--case-study-background:${background}">${blocks.join('')}</div>`;
+  return `<div class="case-study${project.id === '257312467' ? ' case-study-nbricks' : ''}" style="--case-study-background:${background}">${blocks.join('')}</div>`;
 }
 
 function showProject(key) {
@@ -1344,7 +1379,20 @@ if ('IntersectionObserver' in window) {
   const group = document.createElement('div');
   group.className = 'reel-group';
 
-  keys.forEach(key => {
+  let cards = [];
+
+  function rebuild(category = 'all') {
+    group.replaceChildren();
+    const matching = keys.filter(key => projectMatches(key, category));
+    // Small categories are already fully visible in the expanded project grid.
+    section.hidden = matching.length < 3;
+    if (section.hidden) {
+      track.replaceChildren();
+      cards = [];
+      groupWidth = 0;
+      return;
+    }
+    matching.forEach(key => {
     const source = document.querySelector(`.project [data-open="${key}"], .behance-grid [data-open="${key}"]`);
     if (!source) return;
     const card = document.createElement('a');
@@ -1373,10 +1421,11 @@ if ('IntersectionObserver' in window) {
     copy.setAttribute('aria-hidden', 'true');
     copy.querySelectorAll('a').forEach(card => card.tabIndex = -1);
   });
-  track.append(before, group, after);
-  section.hidden = false;
-
-  const cards = [...track.querySelectorAll('.reel-card')];
+    track.replaceChildren(before, group, after);
+    cards = [...track.querySelectorAll('.reel-card')];
+    groupWidth = 0;
+    measure();
+  }
   let groupWidth = 0;
   let stride = 0;
   let visible = false;
@@ -1392,6 +1441,7 @@ if ('IntersectionObserver' in window) {
   let fractionalAdvance = 0;
 
   function measure() {
+    if (section.hidden || !group.children.length || !viewport.clientWidth) return;
     const previousWidth = groupWidth;
     const phase = previousWidth ? (viewport.scrollLeft - previousWidth) / previousWidth : 0;
     groupWidth = group.offsetWidth;
@@ -1414,6 +1464,7 @@ if ('IntersectionObserver' in window) {
   }
 
   function wrap() {
+    if (!groupWidth) return;
     if (!groupWidth || pointerDown || viewport.contains(document.activeElement)) return;
     if (viewport.scrollLeft < groupWidth * .5) viewport.scrollLeft += groupWidth;
     if (viewport.scrollLeft >= groupWidth * 2.5) viewport.scrollLeft -= groupWidth;
@@ -1533,7 +1584,11 @@ if ('IntersectionObserver' in window) {
     }
   }, { threshold: .12 }).observe(section);
   document.addEventListener('visibilitychange', start);
-  measure();
+  document.addEventListener('portfolio-filter-change', event => {
+    interrupt();
+    rebuild(event.detail);
+  });
+  rebuild();
 })();
 
 </script>
